@@ -1,0 +1,59 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: admin-service
+          uri: lb://admin-service
+          predicates:
+            - Path=/admin/**
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
+        - id: job-service
+          uri: lb://job-service
+          predicates:
+            - Path=/jobs/**
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://auth-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8781/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+
+cors:
+  allowed-origins: "*"  # Adjust this based on frontend domain
+  allowed-methods: GET, POST, PUT, DELETE
+  allowed-headers: Authorization, Content-Type
